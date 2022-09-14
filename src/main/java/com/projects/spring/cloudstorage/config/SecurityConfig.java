@@ -11,6 +11,7 @@ import com.projects.spring.cloudstorage.services.AuthenticationService;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     private AuthenticationService authenticationService;
 
     public SecurityConfig(AuthenticationService authenticationService) {
@@ -19,22 +20,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authenticationService);
+        auth.authenticationProvider(this.authenticationService);
     }
 
-    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-        .antMatchers("/login", "/signup", "/css/**", "/js/**").permitAll()
-        .anyRequest().authenticated();
+                .antMatchers("/signup", "/css/**", "/js/**").permitAll()
+                .anyRequest().authenticated();
+
+        http.formLogin( )
+                .loginPage("/login")
+                .permitAll()
+                .and()
+                .logout().permitAll();
 
         http.formLogin()
-        .loginPage("/login")
-        .permitAll();
-
-        http.formLogin()
-        .defaultSuccessUrl("/home", true);
-
+                .defaultSuccessUrl("/home", true);
     }
-    
 }
