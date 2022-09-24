@@ -12,7 +12,7 @@
     <artifactId>cloudstorage</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>cloudstorage</name>
-    <description>Final Project for Udacity's Spring Boot Basics course.</description>
+    <description>Spring Boot project to upload and view files, notes, credentials</description>
 
     <properties>
         <java.version>11</java.version>
