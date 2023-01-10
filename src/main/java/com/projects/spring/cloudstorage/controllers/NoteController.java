@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.projects.spring.cloudstorage.models.Note;
 import com.projects.spring.cloudstorage.services.NoteService;
 import com.projects.spring.cloudstorage.services.UserService;
+import org.springframework.ui.Model;
 
 @Controller
 @RequestMapping("/notes")
@@ -25,7 +26,7 @@ public class NoteController {
     }
 
     @PostMapping
-    public ModelAndView uploadNote(Authentication authentication, Note note) {
+    public ModelAndView uploadNote(Authentication authentication, Note note, Model model) {
         ModelAndView result = new ModelAndView();
         String noteStatus = null;
         String username = authentication.getPrincipal().toString();

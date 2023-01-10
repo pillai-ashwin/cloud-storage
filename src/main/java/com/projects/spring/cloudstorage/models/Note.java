@@ -2,19 +2,26 @@ package com.projects.spring.cloudstorage.models;
 
 public class Note {
     private Integer noteId;
-    String noteTitle;
-    String noteDescription;
-    int userId;
-    
+    private String noteTitle;
+    private String noteDescription;
+    private int userId;
+
     public Note(Integer noteId, String noteTitle, String noteDescription, int userId) {
         this.noteId = noteId;
         this.noteTitle = noteTitle;
         this.noteDescription = noteDescription;
         this.userId = userId;
     }
+
+    public Note() {
+    }
     public Integer getNoteId() {
         return noteId;
     }
+    public void setNoteId(Integer noteId) {
+        this.noteId = noteId;
+    }
+
     public String getNoteTitle() {
         return noteTitle;
     }
