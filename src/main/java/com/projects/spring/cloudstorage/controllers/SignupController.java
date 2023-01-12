@@ -3,49 +3,44 @@ package com.projects.spring.cloudstorage.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.projects.spring.cloudstorage.models.User;
 import com.projects.spring.cloudstorage.services.UserService;
 
-@Controller
+@Controller()
 @RequestMapping("/signup")
 public class SignupController {
-    UserService userService;
-
+    private final UserService userService;
     public SignupController(UserService userService) {
         this.userService = userService;
     }
-
-    @GetMapping
-    public String signupView(User user, Model model) {
-
+    @GetMapping()
+    public String signupView() {
         return "signup";
     }
-
-    @PostMapping
-    public String signupUser(User user, Model model) {
-        String errorMsg = null;
-
-        if(!userService.isUsernameAvailable(user.getUsername())) {
-            errorMsg = "This username is already taken!";
+    @PostMapping()
+    public String signupUser(@ModelAttribute User user, Model model, RedirectAttributes redirectAttributes) {
+        String signupError = null;
+        if (!userService.isUsernameAvailable(user.getUsername())) {
+            signupError = "The username already exists.";
         }
-
-        if(errorMsg == null) {
+        if (signupError == null) {
             int rowsAdded = userService.createUser(user);
             if (rowsAdded < 0) {
-                errorMsg = "Something went wrong, unable to sign up";
+                signupError = "There was an error signing you up. Please try again.";
             }
         }
-
-        if(errorMsg == null) {
-            model.addAttribute("signupSuccess", true);
-        } else {
-            model.addAttribute("errorInSignup", true);
-            model.addAttribute("errorMsg", errorMsg);
+        if (signupError != null) {
+            model.addAttribute("signupError", signupError);
+            return "signup";
+        }else{
+            Boolean signupSuccess = true;
+            redirectAttributes.addFlashAttribute("signupSuccess", signupSuccess);
         }
-
-        return "signup";
+        return "redirect:/login";
     }
 }

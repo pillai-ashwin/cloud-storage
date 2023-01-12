@@ -78,8 +78,8 @@ class CloudStorageApplicationTests {
 		inputPassword.sendKeys(password);
 
 		// Attempt to sign up.
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("buttonSignUp")));
-		WebElement buttonSignUp = driver.findElement(By.id("buttonSignUp"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submit-button")));
+		WebElement buttonSignUp = driver.findElement(By.id("submit-button"));
 		buttonSignUp.click();
 
 		/* Check that the sign up was successful. 
@@ -189,7 +189,7 @@ class CloudStorageApplicationTests {
 		WebElement fileSelectButton = driver.findElement(By.id("fileUpload"));
 		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
 
-		WebElement uploadButton = driver.findElement(By.id("uploadButton"));
+		WebElement uploadButton = driver.findElement(By.id("fileUploadButton"));
 		uploadButton.click();
 		try {
 			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));

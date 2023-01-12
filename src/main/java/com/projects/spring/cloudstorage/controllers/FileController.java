@@ -32,6 +32,7 @@ public class FileController {
         String status = null;
 
         try {
+            if(file == null) throw new IOException("Choose a file to upload");
             if(fileService.addFile(file, auth.getName())) {
                 result.addObject("success", true);
                 status = "File uploaded successfully.";
