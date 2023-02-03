@@ -127,6 +127,7 @@
                       id="nav-credentials"
                       role="tabpanel"
                       aria-labelledby="nav-credentials-tab"
+                      th:object="${credentials}"
                     >
                       <button
                         style="margin: 0.25em"
@@ -140,7 +141,6 @@
                       <div class="table-responsive">
                         <table
                           class="table table-striped"
-                          th:object="${credentials}"
                           id="credentialTable"
                         >
                           <thead>
