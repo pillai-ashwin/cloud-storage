@@ -28,7 +28,7 @@ public class Credential {
     }
 
     public Integer getCredentialId() {
-        return this.credentialId;
+        return credentialId;
     }
 
     public void setCredentialId(Integer credentialId) {
@@ -36,7 +36,7 @@ public class Credential {
     }
 
     public String getUrl() {
-        return this.url;
+        return url;
     }
 
     public void setUrl(String url) {
@@ -44,7 +44,7 @@ public class Credential {
     }
 
     public String getUsername() {
-        return this.username;
+        return username;
     }
 
     public void setUsername(String username) {
@@ -52,7 +52,7 @@ public class Credential {
     }
 
     public String getKey() {
-        return this.key;
+        return key;
     }
 
     public void setKey(String key) {
@@ -60,7 +60,7 @@ public class Credential {
     }
 
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     public void setPassword(String password) {
@@ -68,11 +68,10 @@ public class Credential {
     }
 
     public int getUserId() {
-        return this.userId;
+        return userId;
     }
 
     public void setUserId(int userId) {
         this.userId = userId;
     }
-
 }
