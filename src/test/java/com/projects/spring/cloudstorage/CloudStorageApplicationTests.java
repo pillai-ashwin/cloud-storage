@@ -8,8 +8,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import static java.lang.Thread.sleep;
+
 
 import java.io.File;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -18,29 +22,52 @@ class CloudStorageApplicationTests {
 	@LocalServerPort
 	private int port;
 
-	private WebDriver driver;
+	private String baseUrl;
+
+	private static WebDriver driver;
+	private Logger logger= LoggerFactory.getLogger(CloudStorageApplicationTests.class);
 
 	@BeforeAll
 	static void beforeAll() {
 		WebDriverManager.chromedriver().setup();
+		driver=new ChromeDriver();
 	}
 
-	@BeforeEach
-	public void beforeEach() {
-		this.driver = new ChromeDriver();
-	}
-
-	@AfterEach
-	public void afterEach() {
-		if (this.driver != null) {
+	@AfterAll
+	 public static void afterAll() {
+		if (driver != null) {
 			driver.quit();
 		}
 	}
 
+	@BeforeEach
+	public void beforeEach() throws InterruptedException {
+		// driver = new ChromeDriver();
+		baseUrl="http://localhost:" + this.port;
+		sleep(2000);
+	}
+
 	@Test
-	public void getLoginPage() {
-		driver.get("http://localhost:" + this.port + "/login");
+	@Order(1)
+	/* 
+	 * Verifies that an unauthorized user -
+	 * 1) can only access the login and signup pages.
+	 * 2) cannot access the home page.
+	*/
+	public void getLoginPage() throws InterruptedException {
+		logger.error("test 1 -accessibility and security");
+
+		driver.get(baseUrl + "/login");
 		Assertions.assertEquals("Login", driver.getTitle());
+		sleep(2000);
+
+
+		driver.get(baseUrl+"/signup");
+		Assertions.assertEquals("Sign Up",driver.getTitle());
+		sleep(2000);
+
+		driver.get(baseUrl+"/home");
+        Assertions.assertNotEquals("Home",driver.getTitle());
 	}
 
 	/**
@@ -82,10 +109,10 @@ class CloudStorageApplicationTests {
 		buttonSignUp.click();
 
 		/* Check that the sign up was successful. 
-		// You may have to modify the element "success-msg" and the sign-up 
+		// You may have to modify the element "signup-success-msg" and the sign-up 
 		// success message below depening on the rest of your code.
 		*/
-		Assertions.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
+		Assertions.assertTrue(driver.findElement(By.id("signup-success-msg")).getText().contains("You successfully signed up!"));
 	}
 
 	
@@ -188,7 +215,7 @@ class CloudStorageApplicationTests {
 		WebElement fileSelectButton = driver.findElement(By.id("fileUpload"));
 		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
 
-		WebElement uploadButton = driver.findElement(By.id("fileUploadButton"));
+		WebElement uploadButton = driver.findElement(By.id("uploadButton"));
 		uploadButton.click();
 		try {
 			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
@@ -198,7 +225,4 @@ class CloudStorageApplicationTests {
 		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
 
 	}
-
-
-
 }
