@@ -17,16 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CloudStorageApplicationTests {
 
 	@LocalServerPort
 	private int port;
 
 	private String baseUrl;
-	private final String firstName="Ashwin";
-	private final String lastName="Pillai";
-	private final String username="ashwinpillai";
-	private final String password="ashwinpillai-cloudstorage";
+	// private final String firstName="Ashwin";
+	// private final String lastName="Pillai";
+	// private final String username="ashwinpillai";
+	// private final String password="ashwinpillai-cloudstorage";
 
 	private static WebDriver driver;
 	private Logger logger= LoggerFactory.getLogger(CloudStorageApplicationTests.class);
@@ -86,7 +87,7 @@ class CloudStorageApplicationTests {
 		logger.error("Test 2 - Signup & check for login page redirect");
 		driver.get(baseUrl + "/signup");
 		SignupPage signupPage = new SignupPage(driver);
-		signupPage.signUpNow(firstName, lastName, username, password);
+		signupPage.signUpNow(firstName, lastName, userName, password);
 		//now we should have been redirected to login page with successful msg
 		//driver.navigate().to(baseUrl +"/login");
 		//driver.switchTo().window("/login");
@@ -105,7 +106,7 @@ class CloudStorageApplicationTests {
 		logger.error("Test 3 - Check home page accessibility after login and logout");
         driver.get(baseUrl + "/login");
         LoginPage loginPage=new LoginPage(driver);
-        loginPage.LoginNow(userName,password);
+        loginPage.LoginNow(userName, password);
 		sleep(1000);
 		//Assert page redirected to home so login is successful
 		Assertions.assertEquals("Home",driver.getTitle());
@@ -119,7 +120,7 @@ class CloudStorageApplicationTests {
 
 		//now it is on login page actually, login again for other tests to continue
 		driver.get(baseUrl + "/login");
-		loginPage.LoginNow(username,password);
+		loginPage.LoginNow(userName, password);
 		sleep(1000);
 		//Assert page redirected to home so login is successful
 		Assertions.assertEquals("Home",driver.getTitle());
@@ -137,9 +138,11 @@ class CloudStorageApplicationTests {
 	 * back to the login page after a succesful sign up.
 	 * Read more about the requirement in the rubric: 
 	 * https://review.udacity.com/#!/rubrics/2724/view 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void testRedirection() {
+	@Order(4)
+	public void testRedirection() throws InterruptedException {
 		// Create a test account
 		doMockSignUp("Redirection","Test","RT","123");
 		
@@ -158,9 +161,11 @@ class CloudStorageApplicationTests {
 	 * 
 	 * Read more about custom error pages at: 
 	 * https://attacomsian.com/blog/spring-boot-custom-error-page#displaying-custom-error-page
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void testBadUrl() {
+	@Order(5)
+	public void testBadUrl() throws InterruptedException {
 		// Create a test account
 		doMockSignUp("URL","Test","UT","123");
 		doLogIn("UT", "123");
@@ -182,9 +187,11 @@ class CloudStorageApplicationTests {
 	 * 
 	 * Read more about file size limits here: 
 	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload Limits" section.
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void testLargeUpload() {
+	@Order(6)
+	public void testLargeUpload() throws InterruptedException {
 		// Create a test account
 		doMockSignUp("Large File","Test","LFT","123");
 		doLogIn("LFT", "123");
@@ -197,7 +204,7 @@ class CloudStorageApplicationTests {
 		WebElement fileSelectButton = driver.findElement(By.id("fileUpload"));
 		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
 
-		WebElement uploadButton = driver.findElement(By.id("uploadButton"));
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
 		uploadButton.click();
 		try {
 			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));

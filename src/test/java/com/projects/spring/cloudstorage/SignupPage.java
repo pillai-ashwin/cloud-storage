@@ -18,10 +18,10 @@ public class SignupPage {
     @FindBy(id="inputPassword")
     WebElement passWord;
 
-    @FindBy(id="signupBtn")
+    @FindBy(id="signup-button")
     WebElement signupBtn;
 
-    @FindBy(id="singup-ok-msg")
+    @FindBy(id="signup-success-msg")
     WebElement signupOkMsg;
 
     public SignupPage(WebDriver webDriver) {

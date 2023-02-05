@@ -14,7 +14,7 @@ public class HomePage {
         PageFactory.initElements(webDriver, this);
     }
 
-    @FindBy(id="logout")
+    @FindBy(id="logout-button")
     WebElement logoutBtn;
 
     public void clickLogoutBtn(){

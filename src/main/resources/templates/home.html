@@ -12,7 +12,7 @@
         <div class="container">
             <div id="logoutDiv">
                 <form action="#" method="POST" th:action="@{/logout}">
-                    <button type="submit" class="btn btn-secondary float-right">Logout</button>
+                    <button type="submit" id="logout-button" class="btn btn-secondary float-right">Logout</button>
                 </form>
             </div>
             <div id="contentDiv" style="clear: right;">
@@ -35,7 +35,7 @@
                                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload">
                                     </div>
                                     <div class="col-sm-4">
-                                        <button id="fileUploadButton" type="submit" class="btn btn-dark">Upload</button>
+                                        <button id="file-upload-button" type="submit" class="btn btn-dark">Upload</button>
                                     </div>
                                 </div>
                             </div>
