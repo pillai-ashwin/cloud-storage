@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import static java.lang.Thread.sleep;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,6 +23,10 @@ class CloudStorageApplicationTests {
 	private int port;
 
 	private String baseUrl;
+	private final String firstName="Ashwin";
+	private final String lastName="Pillai";
+	private final String username="ashwinpillai";
+	private final String password="ashwinpillai-cloudstorage";
 
 	private static WebDriver driver;
 	private Logger logger= LoggerFactory.getLogger(CloudStorageApplicationTests.class);
@@ -45,6 +49,7 @@ class CloudStorageApplicationTests {
 		// driver = new ChromeDriver();
 		baseUrl="http://localhost:" + this.port;
 		sleep(2000);
+
 	}
 
 	@Test
@@ -70,80 +75,57 @@ class CloudStorageApplicationTests {
         Assertions.assertNotEquals("Home",driver.getTitle());
 	}
 
-	/**
-	 * PLEASE DO NOT DELETE THIS method.
-	 * Helper method for Udacity-supplied sanity checks.
-	 **/
-	private void doMockSignUp(String firstName, String lastName, String userName, String password){
-		// Create a dummy account for logging in later.
-
-		// Visit the sign-up page.
-		WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
-		driver.get("http://localhost:" + this.port + "/signup");
-		webDriverWait.until(ExpectedConditions.titleContains("Sign Up"));
-		
-		// Fill out credentials
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputFirstName")));
-		WebElement inputFirstName = driver.findElement(By.id("inputFirstName"));
-		inputFirstName.click();
-		inputFirstName.sendKeys(firstName);
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputLastName")));
-		WebElement inputLastName = driver.findElement(By.id("inputLastName"));
-		inputLastName.click();
-		inputLastName.sendKeys(lastName);
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputUsername")));
-		WebElement inputUsername = driver.findElement(By.id("inputUsername"));
-		inputUsername.click();
-		inputUsername.sendKeys(userName);
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputPassword")));
-		WebElement inputPassword = driver.findElement(By.id("inputPassword"));
-		inputPassword.click();
-		inputPassword.sendKeys(password);
-
-		// Attempt to sign up.
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submit-button")));
-		WebElement buttonSignUp = driver.findElement(By.id("submit-button"));
-		buttonSignUp.click();
-
-		/* Check that the sign up was successful. 
-		// You may have to modify the element "signup-success-msg" and the sign-up 
-		// success message below depening on the rest of your code.
-		*/
-		Assertions.assertTrue(driver.findElement(By.id("signup-success-msg")).getText().contains("You successfully signed up!"));
+	@Test
+	@Order(2)
+	/*
+	 * Verify - 
+	 * 1) Sign up a new user.
+	 * 2) After successful sign up user is redirected to login page.
+	 */
+	private void doMockSignUp(String firstName, String lastName, String userName, String password) throws InterruptedException{
+		logger.error("Test 2 - Signup & check for login page redirect");
+		driver.get(baseUrl + "/signup");
+		SignupPage signupPage = new SignupPage(driver);
+		signupPage.signUpNow(firstName, lastName, username, password);
+		//now we should have been redirected to login page with successful msg
+		//driver.navigate().to(baseUrl +"/login");
+		//driver.switchTo().window("/login");
+		sleep(4000);
+		assertEquals("Login", driver.getTitle());
 	}
 
-	
-	
-	/**
-	 * PLEASE DO NOT DELETE THIS method.
-	 * Helper method for Udacity-supplied sanity checks.
-	 **/
-	private void doLogIn(String userName, String password)
-	{
-		// Log in to our dummy account.
-		driver.get("http://localhost:" + this.port + "/login");
-		WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+	@Test
+	@Order(3)
+	/*
+	 * Verify -
+	 * 1) Log in and verify that the home page is accessible,
+	 * 2) Log out and verify that the home page is no longer accessible
+	 */
+	private void doLogIn(String userName, String password) throws InterruptedException {
+		logger.error("Test 3 - Check home page accessibility after login and logout");
+        driver.get(baseUrl + "/login");
+        LoginPage loginPage=new LoginPage(driver);
+        loginPage.LoginNow(userName,password);
+		sleep(1000);
+		//Assert page redirected to home so login is successful
+		Assertions.assertEquals("Home",driver.getTitle());
 
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputUsername")));
-		WebElement loginUserName = driver.findElement(By.id("inputUsername"));
-		loginUserName.click();
-		loginUserName.sendKeys(userName);
+		driver.get(baseUrl + "/home");
+		HomePage homePage=new HomePage(driver);
+		homePage.clickLogoutBtn();
+		sleep(1000);
+		//Assert home page is not accessible after logout
+		Assertions.assertNotEquals("Home",driver.getTitle());
 
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputPassword")));
-		WebElement loginPassword = driver.findElement(By.id("inputPassword"));
-		loginPassword.click();
-		loginPassword.sendKeys(password);
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login-button")));
-		WebElement loginButton = driver.findElement(By.id("login-button"));
-		loginButton.click();
-
-		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+		//now it is on login page actually, login again for other tests to continue
+		driver.get(baseUrl + "/login");
+		loginPage.LoginNow(username,password);
+		sleep(1000);
+		//Assert page redirected to home so login is successful
+		Assertions.assertEquals("Home",driver.getTitle());
 
 	}
+	
 
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
