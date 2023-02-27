@@ -61,7 +61,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
-                      <button style="margin: 0.25em;" type="button" id="note-model-btn" class="btn btn-info float-right" onclick="showNoteModal()">
+                      <button id="add-note-button" style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
                           + Add a New Note
                       </button>
 
@@ -78,14 +78,16 @@
                                   <tr th:each="note : ${notes}" class="notes">
                                       <td>
                                           <button
+                                              id="note-edit-button"
                                               type="button"
                                               class="btn btn-success edit-note"
                                               th:onclick="showNoteModal([[${note.noteId}]],[[${note.noteTitle}]],[[${note.noteDescription}]])"
                                           >Edit</button>
-                                          <a class="btn btn-danger delete-note" th:href="@{/note/delete/{noteId}(noteId=${note.noteId})}">Delete</a>
+                                          <a id="noteDeleteBtn" class="btn btn-danger delete-note" th:href="@{/note/delete/{noteId}(noteId=${note.noteId})}">Delete</a>
                                       </td>
-                                      <th scope="row" th:text="${note.noteTitle}">Example Note Title</th>
-                                      <td th:text="${note.noteDescription}">Example Note Description </td>
+                                      <!-- TODO: Maybe the template does not like an id that will be repeated for all the elements -->
+                                      <th id="note-title-display" scope="row" th:text="${note.noteTitle}">Example Note Title</th>
+                                      <td id="note-description-display" th:text="${note.noteDescription}">Example Note Description </td>
                                   </tr>
                               </tbody>
                           </table>
@@ -116,7 +118,7 @@
                                   </div>
                                   <div class="modal-footer">
                                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                      <button type="button" class="btn btn-primary" id="submit-note" onclick="$('#noteSubmit').click();">Save changes</button>
+                                      <button type="button" class="btn btn-primary" onclick="$('#noteSubmit').click();">Save changes</button>
                                   </div>
                               </div>
                           </div>

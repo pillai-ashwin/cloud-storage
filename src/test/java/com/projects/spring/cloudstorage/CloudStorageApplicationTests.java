@@ -52,7 +52,7 @@ class CloudStorageApplicationTests {
 		sleep(2000);
 
 	}
-
+	// Part 1 - Test signup and login flow
 	@Test
 	@Order(1)
 	/* 
@@ -127,19 +127,6 @@ class CloudStorageApplicationTests {
 
 	}
 	
-
-	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
-	 * This test is provided by Udacity to perform some basic sanity testing of 
-	 * your code to ensure that it meets certain rubric criteria. 
-	 * 
-	 * If this test is failing, please ensure that you are handling redirecting users 
-	 * back to the login page after a succesful sign up.
-	 * Read more about the requirement in the rubric: 
-	 * https://review.udacity.com/#!/rubrics/2724/view 
-	 * @throws InterruptedException
-	 */
 	@Test
 	@Order(4)
 	public void testRedirection() throws InterruptedException {
@@ -150,19 +137,6 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
 	}
 
-	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
-	 * This test is provided by Udacity to perform some basic sanity testing of 
-	 * your code to ensure that it meets certain rubric criteria. 
-	 * 
-	 * If this test is failing, please ensure that you are handling bad URLs 
-	 * gracefully, for example with a custom error page.
-	 * 
-	 * Read more about custom error pages at: 
-	 * https://attacomsian.com/blog/spring-boot-custom-error-page#displaying-custom-error-page
-	 * @throws InterruptedException
-	 */
 	@Test
 	@Order(5)
 	public void testBadUrl() throws InterruptedException {
@@ -176,19 +150,6 @@ class CloudStorageApplicationTests {
 	}
 
 
-	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
-	 * This test is provided by Udacity to perform some basic sanity testing of 
-	 * your code to ensure that it meets certain rubric criteria. 
-	 * 
-	 * If this test is failing, please ensure that you are handling uploading large files (>1MB),
-	 * gracefully in your code. 
-	 * 
-	 * Read more about file size limits here: 
-	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload Limits" section.
-	 * @throws InterruptedException
-	 */
 	@Test
 	@Order(6)
 	public void testLargeUpload() throws InterruptedException {
@@ -213,5 +174,101 @@ class CloudStorageApplicationTests {
 		}
 		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
 
+	}
+
+	@Test
+	@Order(7)
+	public void testNotes() throws Exception{
+		logger.error("Test 4 - Notes");
+		// Create a test account
+		doMockSignUp("Note Feature","Test","NFT","123");
+		doLogIn("NFT", "123");
+		//c_loginSuccess();
+		String noteTitle_org = "Note Title Create Test";
+		String noteDes_org = "Note Description Create Test";
+		String noteTitle_upt = "Note Title Update Test";
+		String noteDes_upt = "Note Description Update Test";
+		driver.get(baseUrl+"/home");
+		NotePage notePage=new NotePage(driver);
+
+		waitForVisibility(notePage.getNoteTabId());
+		notePage.clickNoteTab();
+
+		waitForVisibility(notePage.getAddNoteBtnId());
+		notePage.clickAddNoteBtn();
+
+		//Create New Note and verify//
+		//now the Modal is there, input values
+		//waitForVisibility(notePage.getNoteSubmitBtnId());
+		notePage.inputNoteTitle(noteTitle_org);
+		notePage.inputNoteDescription(noteDes_org);
+		sleep(2000);
+		notePage.submitNote();
+		//go back to noteTab
+		sleep(2000);
+		// try to create note
+		WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+
+		try {
+			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
+			driver.get(baseUrl+"/home");
+		} catch (org.openqa.selenium.TimeoutException e) {
+			System.out.println("Note creation failed");
+		}
+		sleep(2000);
+		notePage.clickNoteTab();
+		waitForVisibility(notePage.getNoteTitleDisplayId());
+        //verify new note is added and displayed as expected
+		Assertions.assertEquals(notePage.getNoteTitleDisplay(),noteTitle_org);
+		Assertions.assertEquals(notePage.getNoteDesDisplay(),noteDes_org);
+
+		sleep(3000);
+
+		//Edit the newly created Note and verify//
+		notePage.clickNoteEditBtn();
+		sleep(1000);
+		//waitForVisibility(notePage.getNoteSubmitBtnId());
+		//edit the note
+		notePage.inputNoteTitle(noteTitle_upt);
+		notePage.inputNoteDescription(noteDes_upt);
+		sleep(2000);
+		notePage.submitNote();
+
+		try {
+			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
+			driver.get(baseUrl+"/home");
+		} catch (org.openqa.selenium.TimeoutException e) {
+			System.out.println("Note update failed");
+		}
+
+		//go back to noteTab
+		sleep(2000);
+		notePage.clickNoteTab();
+		waitForVisibility(notePage.getNoteTabId());
+		//verify  note is edited and displayed as expected
+		Assertions.assertEquals(notePage.getNoteTitleDisplay(),noteTitle_upt);
+		Assertions.assertEquals(notePage.getNoteDesDisplay(),noteDes_upt);
+
+		//Delete the newly edited Note and verify//
+		//go back to notTab
+		waitForVisibility(notePage.getNoteTabId());
+		notePage.clickNoteTab();
+		//delete the Note and verify it is not there
+		notePage.clickNoteDeleteBtn();
+		//Assertions.assertNull(notePage.getNoteTitleDisplay());
+		//Assertions.assertThrows(Exception.class,null);
+
+		sleep(2000);
+		//go back to notTab, visually see note is deleted and let's assert it
+		waitForVisibility(notePage.getNoteTabId());
+		notePage.clickNoteTab();
+		sleep(1000);
+		Assertions.assertEquals(0,notePage.getNoteEditBtns().size());
+
+	}
+
+	private void waitForVisibility(String id) {
+		WebDriverWait wait = new WebDriverWait(driver, 4000);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
 	}
 }
