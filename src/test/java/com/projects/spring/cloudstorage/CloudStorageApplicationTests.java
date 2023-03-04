@@ -259,7 +259,8 @@ class CloudStorageApplicationTests {
 		//Assertions.assertThrows(Exception.class,null);
 
 		sleep(2000);
-		//go back to notTab, visually see note is deleted and let's assert it
+		//go back to noteTab, visually see note is deleted and let's assert it
+		driver.get(baseUrl+"/home");
 		waitForVisibility(notePage.getNoteTabId());
 		notePage.clickNoteTab();
 		sleep(1000);

@@ -83,7 +83,7 @@
                                               class="btn btn-success edit-note"
                                               th:onclick="showNoteModal([[${note.noteId}]],[[${note.noteTitle}]],[[${note.noteDescription}]])"
                                           >Edit</button>
-                                          <a id="noteDeleteBtn" class="btn btn-danger delete-note" th:href="@{/note/delete/{noteId}(noteId=${note.noteId})}">Delete</a>
+                                          <a id="noteDeleteBtn" class="btn btn-danger delete-note" th:href="@{/notes/delete/{noteId}(noteId=${note.noteId})}">Delete</a>
                                       </td>
                                       <!-- TODO: Maybe the template does not like an id that will be repeated for all the elements -->
                                       <th id="note-title-display" scope="row" th:text="${note.noteTitle}">Example Note Title</th>
