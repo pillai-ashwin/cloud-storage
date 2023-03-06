@@ -22,7 +22,7 @@ public class NotePage {
     private final String noteTitleDisplayId="note-title-display";
     private final String noteDesDisplayId="note-description-display";
     private final String noteEditBtnId="note-edit-button";
-    private final String noteDeleteBtnId="noteDeleteBtn";
+    private final String noteDeleteBtnId="note-delete-button";
 
     public String getNoteTabId() {
         return noteTabId;

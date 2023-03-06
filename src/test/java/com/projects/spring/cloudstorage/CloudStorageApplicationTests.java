@@ -10,8 +10,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+
+import com.projects.spring.cloudstorage.services.CredentialService;
+import com.projects.spring.cloudstorage.services.EncryptionService;
+
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,6 +33,11 @@ class CloudStorageApplicationTests {
 	// private final String lastName="Pillai";
 	// private final String username="ashwinpillai";
 	// private final String password="ashwinpillai-cloudstorage";
+
+	@Autowired
+	private EncryptionService encryptionService;
+	@Autowired
+	private CredentialService credentialService;
 
 	private static WebDriver driver;
 	private Logger logger= LoggerFactory.getLogger(CloudStorageApplicationTests.class);
@@ -183,7 +193,7 @@ class CloudStorageApplicationTests {
 		// Create a test account
 		doMockSignUp("Note Feature","Test","NFT","123");
 		doLogIn("NFT", "123");
-		//c_loginSuccess();
+
 		String noteTitle_org = "Note Title Create Test";
 		String noteDes_org = "Note Description Create Test";
 		String noteTitle_upt = "Note Title Update Test";
@@ -266,6 +276,51 @@ class CloudStorageApplicationTests {
 		sleep(1000);
 		Assertions.assertEquals(0,notePage.getNoteEditBtns().size());
 
+	}
+
+	@Test
+	@Order(8)
+	public void testCredentials() throws Exception {
+		logger.error("Test 5 - Credentials");
+		// Create a test account
+		doMockSignUp("Credentials Feature","Test","CFT","123");
+		doLogIn("CFT", "123");
+		
+		driver.get(baseUrl + "/home");
+		CredentialPage credentialPage = new CredentialPage(driver);
+
+		//Credentials
+		String[] urls= new String[]{"foo.com", "abc.com", "xyz.com"};
+		String[] unames = new String[]{"naruto","sasuke","sakura"};
+		String[] pws = new String[]{"rasengan","chidori","chaa"};
+		String[] urls_upt= new String[]{"sagemode.com", "susanoo.com", "healing.com"};
+		String[] unames_upt = new String[]{"uzumaki","uchiha","haruki"};
+		String[] pws_upt = new String[]{"hokage","jonin","chunin"};
+
+		//Create new Credentials and verify
+		int total=3;
+		for(int pos=0;pos<total;pos++){
+			//wait for Credential page is visible
+			waitForVisibility(credentialPage.getCredTabId());
+			credentialPage.clickCredTab();
+			sleep(1000);
+			//click add new credential button
+			waitForVisibility(credentialPage.getAddCredBtnId());
+			credentialPage.clickAddCredBtn();
+			//now the modal is there, input values
+			credentialPage.inputUrl(urls[pos]);
+			credentialPage.inputUserName(unames[pos]);
+			credentialPage.inputPasswd(pws[pos]);
+			sleep(2000);
+			credentialPage.clickCredSubmitBtn();
+			WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+			try {
+				webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
+				driver.get(baseUrl+"/home");
+			} catch (org.openqa.selenium.TimeoutException e) {
+				System.out.println("Credential creation failed");
+			}
+		}
 	}
 
 	private void waitForVisibility(String id) {
