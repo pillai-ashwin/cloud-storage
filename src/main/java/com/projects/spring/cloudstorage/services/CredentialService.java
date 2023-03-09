@@ -78,4 +78,6 @@ public class CredentialService {
         }
         return encryptionService.decryptValue(credential.getPassword(), credential.getKey());
     }
+
+    public String getKeyById(Integer id){ return credMapper.getKey(id);}
 }

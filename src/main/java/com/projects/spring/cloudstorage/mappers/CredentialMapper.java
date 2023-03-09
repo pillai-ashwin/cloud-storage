@@ -35,4 +35,7 @@ public interface CredentialMapper {
 
     @Select("SELECT * FROM CREDENTIALS WHERE userId = #{userId}")
     List<Credential> findCredentialByUser(int userId);
+
+    @Select("Select key FROM CREDENTIALS WHERE credentialId=#{credentialId}")
+    String getKey(Integer credentialId);
 }

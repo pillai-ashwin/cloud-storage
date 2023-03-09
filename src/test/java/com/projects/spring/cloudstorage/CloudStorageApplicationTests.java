@@ -290,17 +290,17 @@ class CloudStorageApplicationTests {
 		CredentialPage credentialPage = new CredentialPage(driver);
 
 		//Credentials
-		String[] urls= new String[]{"foo.com", "abc.com", "xyz.com"};
-		String[] unames = new String[]{"naruto","sasuke","sakura"};
-		String[] pws = new String[]{"rasengan","chidori","chaa"};
+		String[] urls_org= new String[]{"foo.com", "abc.com", "xyz.com"};
+		String[] usernames_org = new String[]{"naruto","sasuke","sakura"};
+		String[] passwords_org = new String[]{"rasengan","chidori","chaa"};
 		String[] urls_upt= new String[]{"sagemode.com", "susanoo.com", "healing.com"};
-		String[] unames_upt = new String[]{"uzumaki","uchiha","haruki"};
-		String[] pws_upt = new String[]{"hokage","jonin","chunin"};
+		String[] usernames_upt = new String[]{"uzumaki","uchiha","haruki"};
+		String[] passwords_upt = new String[]{"hokage","jonin","chunin"};
 
-		//Create new Credentials and verify
+		//Create new credentials
 		int total=3;
 		for(int pos=0;pos<total;pos++){
-			//wait for Credential page is visible
+			//wait for credential page is visible
 			waitForVisibility(credentialPage.getCredTabId());
 			credentialPage.clickCredTab();
 			sleep(1000);
@@ -308,9 +308,9 @@ class CloudStorageApplicationTests {
 			waitForVisibility(credentialPage.getAddCredBtnId());
 			credentialPage.clickAddCredBtn();
 			//now the modal is there, input values
-			credentialPage.inputUrl(urls[pos]);
-			credentialPage.inputUserName(unames[pos]);
-			credentialPage.inputPasswd(pws[pos]);
+			credentialPage.inputUrl(urls_org[pos]);
+			credentialPage.inputUserName(usernames_org[pos]);
+			credentialPage.inputPasswd(passwords_org[pos]);
 			sleep(2000);
 			credentialPage.clickCredSubmitBtn();
 			WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
@@ -318,9 +318,75 @@ class CloudStorageApplicationTests {
 				webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
 				driver.get(baseUrl+"/home");
 			} catch (org.openqa.selenium.TimeoutException e) {
-				System.out.println("Credential creation failed");
+				logger.error("Credential creation failed");
 			}
 		}
+
+		waitForVisibility(credentialPage.getCredTabId());
+		credentialPage.clickCredTab();
+		sleep(1000);
+
+		//Verify credentials created
+		for(int pos=0; pos<total; pos++) {
+			String displayedUrl = credentialPage.getUrl(pos);
+			String displayedUname = credentialPage.getUname(pos);	
+			String displayedPwd = credentialPage.getPw(pos);
+			//decrypt password
+			String key = credentialService.getKeyById(pos+1);
+			displayedPwd= encryptionService.decryptValue(displayedPwd,key);
+
+			Assertions.assertEquals(displayedUrl,urls_org[pos]);
+			Assertions.assertEquals(displayedUname,usernames_org[pos]);
+            Assertions.assertEquals(displayedPwd,passwords_org[pos]);
+		}
+
+		//Edit Credentials and verify if the updated results match the updated values
+		for(int pos=0;pos<total;pos++) {
+			//wait for Credential page is visible
+			waitForVisibility(credentialPage.getCredTabId());
+			credentialPage.clickCredTab();
+			sleep(1000);
+			credentialPage.clickEditCredBtn(pos);
+			sleep(1000);
+			credentialPage.inputUrl(urls_upt[pos]);
+			credentialPage.inputUserName(usernames_upt[pos]);
+			//before update pwd, first verify it is decrypted
+			Assertions.assertNotEquals(credentialPage.getPasswdInModal(),passwords_org[pos]);
+			credentialPage.inputPasswd(passwords_upt[pos]);
+			sleep(2000);
+			credentialPage.clickCredSubmitBtn();
+			WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+			try {
+				webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
+				driver.get(baseUrl+"/home");
+			} catch (org.openqa.selenium.TimeoutException e) {
+				logger.error("Credential update failed");
+			}
+		}
+
+		// Verify deleting credentials
+		for(int pos=0;pos<total;pos++){
+			waitForVisibility(credentialPage.getCredTabId());
+			credentialPage.clickCredTab();
+			sleep(1000);
+
+            //After each deletion, the next one to delete is always at position 0
+			credentialPage.clickDeleteCredBtn(0);
+			WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+			try {
+				webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
+				driver.get(baseUrl+"/home");
+			} catch (org.openqa.selenium.TimeoutException e) {
+				logger.error("Credential update failed");
+			}
+		}
+
+		//verify that all credentials are deleted
+		waitForVisibility(credentialPage.getCredTabId());
+		credentialPage.clickCredTab();
+		Assertions.assertEquals(0,credentialPage.getEditBtns().size());
+		sleep(2000);
+
 	}
 
 	private void waitForVisibility(String id) {
